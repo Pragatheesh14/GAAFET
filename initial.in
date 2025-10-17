@@ -1,0 +1,77 @@
+go atlas
+TITLE NAND
+###Meshing
+mesh space.mult=1
+#source
+x.mesh loc=0.000 spac=0.1
+x.mesh loc=0.0285 spac=0.05
+x.mesh loc=0.0295 spac=0.1
+x.mesh loc=0.0495 spac=0.05
+x.mesh loc=0.0505 spac=0.1
+x.mesh loc=0.0705 spac=0.05
+x.mesh loc=0.0715 spac=0.1
+x.mesh loc=0.1 spac=0.1
+
+y.mesh loc=0.0 spac=0.1
+y.mesh loc=0.002 spac=0.05
+y.mesh loc=0.051 spac=0.05
+y.mesh loc=0.052 spac=0.1
+y.mesh loc=0.102 spac=0.1
+
+####region
+region num=1 material=Air
+
+region num=3 sio2    x.min=0.0285 x.max=0.0295 y.min=0.00 y.max=0.051
+region num=4 sio2    x.min=0.0495 x.max=0.0505 y.min=0.00 y.max=0.051
+region num=5 sio2    x.min=0.0705 x.max=0.0715 y.min=0.00 y.max=0.051
+
+region num=7 sio2    x.min=0.0285 x.max=0.0715 y.min=0.051 y.max=0.052
+
+#nregionleft
+region num=8 silicon x.min=0.00 x.max=0.0285 y.min=0.002 y.max=0.042  
+
+#nregionright
+region num=9 silicon x.min=0.0715 x.max=0.1 y.min=0.002 y.max=0.042 
+
+#pregion
+region num=10 silicon x.min=0.0 x.max=0.1 y.min=0.052 y.max=0.0102 
+
+#electrode
+electrode name=drain 	x.min=0.0 x.max=0.0285 y.min=0.00 y.max=0.002
+electrode name=gate1 	x.min=0.0295 x.max=0.0495 y.min=0 y.max=0.051
+electrode name=gate2	x.min = 0.0505 x.max=0.0705 y.min=0 y.max=0.051
+electrode name=source 	x.min=0.0705 x.max=0.1 y.min=0.00 y.max=0.002
+
+#doping
+
+doping uniform n.type conc=1e17 reg= 8
+doping uniform n.type conc=1e17 reg= 9
+
+doping uniform p.type conc=1e17 reg= 10
+
+#contact
+
+#contact
+contact name=drain
+contact name=gate1 workfunction=4.7
+contact name=gate2 workfunction=4.5
+contact name=source
+save outf=nand_pp.str
+
+#models
+model bipolar FLDMOB
+solve init
+#method
+method newton
+#solve
+
+solve init
+solve vgate1=1 
+solve vgate2=1 
+log outf=nor_g_c.log master
+solve vdrain=0 vstep=0.5 vfinal=3 name=drain
+save outf=nand_pp.str
+tonyplot nand_pp.log
+log off
+
+quit
